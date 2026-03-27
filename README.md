@@ -152,6 +152,23 @@ Latest release:
 
 ## Key Interactions
 
+Commit tree context:
+
+- Press `c` to switch the center pane from changed files to branch commit history.
+- The `COMMITS` pane shows a compact `git log --graph`-style strip before each subject so merge-heavy branches are easier to scan.
+- The graph is intentionally compact: it shows recent branch context for review, not a full Git topology browser.
+
+Example:
+
+```text
+*   a1b2c3d Merge branch 'feature/x'
+| * d4e5f6a fix: tighten validation
+* | 1122334 feat: add review shortcut
+|/
+```
+
+The README uses text examples only. Do not commit screenshots from private or company repositories.
+
 Key interactions:
 
 - `f`: current uncommitted file changes
