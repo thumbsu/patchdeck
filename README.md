@@ -48,6 +48,16 @@ before building the TUI.
 
 ## Usage
 
+Quick start:
+
+```bash
+git clone git@github-personal:thumbsu/patchdeck.git
+cd patchdeck
+./scripts/install.sh
+patchdeck use /absolute/path/to/repo
+patchdeck
+```
+
 Run the TUI:
 
 ```bash
@@ -89,12 +99,32 @@ Or:
 Install on another computer:
 
 ```bash
-git clone <your-repo-url>
+git clone git@github-personal:thumbsu/patchdeck.git
 cd patchdeck
 ./scripts/install.sh
 patchdeck use /absolute/path/to/repo
 patchdeck
 ```
+
+HTTPS clone:
+
+```bash
+git clone https://github.com/thumbsu/patchdeck.git
+```
+
+## Releases
+
+Tagged builds publish release binaries for:
+
+- macOS arm64
+- macOS amd64
+- Linux amd64
+- Linux arm64
+
+If you prefer downloading a binary instead of building locally, use the latest
+GitHub Release from:
+
+- https://github.com/thumbsu/patchdeck/releases
 
 Key interactions:
 
