@@ -1361,7 +1361,7 @@ func (m Model) renderWorktrees(rows []row, width, height int, active bool, stage
 	}
 
 	body := strings.Join(lines[1:], "\n")
-	return style.Render(renderViewport(innerWidth, contentHeight, m.worktreeOffset*2, lines[0], body))
+	return style.Render(renderViewport(innerWidth, contentHeight, 0, lines[0], body))
 }
 
 func statusBadgeText(row row) (string, lipgloss.Style) {
@@ -1425,7 +1425,7 @@ func (m Model) renderFiles(files []statusmodel.ChangedFile, width, height int, a
 	}
 
 	body := strings.Join(lines[1:], "\n")
-	return style.Render(renderViewport(innerWidth, contentHeight, m.fileOffset*2, lines[0], body))
+	return style.Render(renderViewport(innerWidth, contentHeight, 0, lines[0], body))
 }
 
 func (m Model) renderCommits(commits []commitmodel.Commit, width, height int, active bool, stageLabel ...string) string {
@@ -1467,7 +1467,7 @@ func (m Model) renderCommits(commits []commitmodel.Commit, width, height int, ac
 	}
 
 	body := strings.Join(lines[1:], "\n")
-	return style.Render(renderViewport(innerWidth, contentHeight, m.commitOffset*2, lines[0], body))
+	return style.Render(renderViewport(innerWidth, contentHeight, 0, lines[0], body))
 }
 
 func (m Model) renderCommitFiles(files []commitmodel.CommitFile, width, height int, active bool, stageLabel ...string) string {
@@ -1516,7 +1516,7 @@ func (m Model) renderCommitFiles(files []commitmodel.CommitFile, width, height i
 	}
 
 	body := strings.Join(lines[1:], "\n")
-	return style.Render(renderViewport(innerWidth, contentHeight, m.commitFileOffset*2, lines[0], body))
+	return style.Render(renderViewport(innerWidth, contentHeight, 0, lines[0], body))
 }
 
 func (m Model) renderDiff(width, height int, active bool, stageLabel ...string) string {

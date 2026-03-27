@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/thumbsu/patchdeck/internal/commitmodel"
@@ -121,5 +122,25 @@ func TestSelectWorktreeSelectsFirstFile(t *testing.T) {
 	}
 	if next.selectedFilePath != "first.go" {
 		t.Fatalf("expected first file selected, got %q", next.selectedFilePath)
+	}
+}
+
+func TestRenderFilesKeepsSelectedFileVisibleAfterScroll(t *testing.T) {
+	m := New("")
+	m.selectedFilePath = "pkg/second.go"
+	m.fileOffset = 1
+
+	files := []statusmodel.ChangedFile{
+		{Path: "pkg/first.go", BaseName: "first.go", Dir: "pkg"},
+		{Path: "pkg/second.go", BaseName: "second.go", Dir: "pkg"},
+		{Path: "pkg/third.go", BaseName: "third.go", Dir: "pkg"},
+	}
+
+	view := m.renderFiles(files, 40, 6, true)
+	if strings.Contains(view, "first.go") {
+		t.Fatalf("expected first file to be scrolled out, got view:\n%s", view)
+	}
+	if !strings.Contains(view, "second.go") {
+		t.Fatalf("expected selected file to remain visible, got view:\n%s", view)
 	}
 }
