@@ -9,10 +9,10 @@ import (
 	"sort"
 	"time"
 
-	"github.com/user/patchdeck/internal/config"
-	"github.com/user/patchdeck/internal/scanner"
-	"github.com/user/patchdeck/internal/statusmodel"
-	"github.com/user/patchdeck/internal/tui"
+	"github.com/thumbsu/patchdeck/internal/config"
+	"github.com/thumbsu/patchdeck/internal/scanner"
+	"github.com/thumbsu/patchdeck/internal/statusmodel"
+	"github.com/thumbsu/patchdeck/internal/tui"
 )
 
 func main() {
