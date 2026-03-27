@@ -51,9 +51,7 @@ before building the TUI.
 Quick start:
 
 ```bash
-git clone git@github-personal:thumbsu/patchdeck.git
-cd patchdeck
-./scripts/install.sh
+curl -fsSL https://raw.githubusercontent.com/thumbsu/patchdeck/main/scripts/install.sh | bash
 patchdeck use /absolute/path/to/repo
 patchdeck
 ```
@@ -106,6 +104,12 @@ patchdeck use /absolute/path/to/repo
 patchdeck
 ```
 
+Build from source explicitly:
+
+```bash
+./scripts/install.sh --build-from-source
+```
+
 HTTPS clone:
 
 ```bash
@@ -125,6 +129,15 @@ If you prefer downloading a binary instead of building locally, use the latest
 GitHub Release from:
 
 - https://github.com/thumbsu/patchdeck/releases
+
+## Homebrew
+
+Install with:
+
+```bash
+brew tap thumbsu/tap https://github.com/thumbsu/homebrew-tap
+brew install thumbsu/tap/patchdeck
+```
 
 Key interactions:
 
