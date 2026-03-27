@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lu1ee/patchdeck/internal/gitutil"
+	"github.com/thumbsu/patchdeck/internal/gitutil"
 )
 
 type Commit struct {

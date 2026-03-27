@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lu1ee/patchdeck/internal/commitmodel"
-	"github.com/lu1ee/patchdeck/internal/gitutil"
-	"github.com/lu1ee/patchdeck/internal/statusmodel"
+	"github.com/thumbsu/patchdeck/internal/commitmodel"
+	"github.com/thumbsu/patchdeck/internal/gitutil"
+	"github.com/thumbsu/patchdeck/internal/statusmodel"
 )
 
 const (

@@ -1,4 +1,4 @@
-module github.com/lu1ee/patchdeck
+module github.com/thumbsu/patchdeck
 
 go 1.26.0
 

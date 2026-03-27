@@ -3,7 +3,7 @@ package statusmodel
 import (
 	"testing"
 
-	"github.com/lu1ee/patchdeck/internal/scanner"
+	"github.com/thumbsu/patchdeck/internal/scanner"
 )
 
 func TestParseStatus(t *testing.T) {

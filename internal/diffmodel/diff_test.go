@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lu1ee/patchdeck/internal/statusmodel"
+	"github.com/thumbsu/patchdeck/internal/statusmodel"
 )
 
 func TestLoadDirectoryPreview(t *testing.T) {

@@ -3,10 +3,10 @@ package tui
 import (
 	"testing"
 
-	"github.com/lu1ee/patchdeck/internal/commitmodel"
-	"github.com/lu1ee/patchdeck/internal/diffmodel"
-	"github.com/lu1ee/patchdeck/internal/scanner"
-	"github.com/lu1ee/patchdeck/internal/statusmodel"
+	"github.com/thumbsu/patchdeck/internal/commitmodel"
+	"github.com/thumbsu/patchdeck/internal/diffmodel"
+	"github.com/thumbsu/patchdeck/internal/scanner"
+	"github.com/thumbsu/patchdeck/internal/statusmodel"
 )
 
 func TestSelectCommitClearsStaleCommitFileSelection(t *testing.T) {

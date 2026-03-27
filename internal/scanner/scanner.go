@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lu1ee/patchdeck/internal/gitutil"
+	"github.com/thumbsu/patchdeck/internal/gitutil"
 )
 
 type WorktreeRef struct {

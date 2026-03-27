@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/lu1ee/patchdeck/internal/gitutil"
-	"github.com/lu1ee/patchdeck/internal/scanner"
+	"github.com/thumbsu/patchdeck/internal/gitutil"
+	"github.com/thumbsu/patchdeck/internal/scanner"
 )
 
 type Severity int
