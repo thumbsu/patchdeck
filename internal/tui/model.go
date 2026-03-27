@@ -1449,6 +1449,8 @@ func (m Model) renderCommits(commits []commitmodel.Commit, width, height int, ac
 		return style.Render(renderViewport(innerWidth, contentHeight, 0, lines[0], body))
 	}
 
+	graphColumns := commitGraphColumns(innerWidth)
+	graphWidth := commitGraphWidth(graphColumns)
 	maxItems := visibleItemCount(height)
 	start, end := windowFromOffset(len(commits), m.commitOffset, maxItems)
 	for _, commit := range commits[start:end] {
@@ -1458,13 +1460,79 @@ func (m Model) renderCommits(commits []commitmodel.Commit, width, height int, ac
 			prefix = "> "
 			lineStyle = selectedStyle
 		}
-		main := truncate(fmt.Sprintf("%s%-8s %s", prefix, commit.ShortHash, commit.Subject), innerWidth)
-		lines = append(lines, lineStyle.Render(main))
+
+		graphStrip := compactCommitGraph(commit.Graph, len(commit.Parents) > 1, graphColumns)
+		main := truncate(fmt.Sprintf("%s%-*s %-8s %s", prefix, graphWidth, graphStrip, commit.ShortHash, commit.Subject), innerWidth)
+		lines = append(lines, renderCommitLine(main, graphStrip, lineStyle))
 		lines = append(lines, mutedStyle.Render(truncate("   "+commit.Relative, innerWidth)))
 	}
 
 	body := strings.Join(lines[1:], "\n")
 	return style.Render(renderViewport(innerWidth, contentHeight, 0, lines[0], body))
+}
+
+func renderCommitLine(main string, graphStrip string, lineStyle lipgloss.Style) string {
+	if strings.TrimSpace(graphStrip) == "" {
+		return lineStyle.Render(main)
+	}
+
+	styled := lineStyle.Render(main)
+	if lineStyle.GetForeground() == selectedStyle.GetForeground() && lineStyle.GetBold() == selectedStyle.GetBold() {
+		return styled
+	}
+	return strings.Replace(styled, graphStrip, mutedStyle.Render(graphStrip), 1)
+}
+
+func compactCommitGraph(graph string, isMerge bool, maxColumns int) string {
+	graph = strings.TrimSpace(graph)
+	if graph == "" {
+		if isMerge && maxColumns > 1 {
+			return "* \\"
+		}
+		return "*"
+	}
+
+	tokens := strings.Fields(graph)
+	if len(tokens) == 0 {
+		if isMerge && maxColumns > 1 {
+			return "* \\"
+		}
+		return "*"
+	}
+	if isMerge && maxColumns > len(tokens) && !containsGraphToken(tokens, "\\") {
+		tokens = append(tokens, "\\")
+	}
+	if len(tokens) > maxColumns {
+		tokens = tokens[:maxColumns]
+	}
+	return strings.Join(tokens, " ")
+}
+
+func containsGraphToken(tokens []string, target string) bool {
+	for _, token := range tokens {
+		if token == target {
+			return true
+		}
+	}
+	return false
+}
+
+func commitGraphColumns(innerWidth int) int {
+	switch {
+	case innerWidth >= 42:
+		return 4
+	case innerWidth >= 34:
+		return 3
+	default:
+		return 2
+	}
+}
+
+func commitGraphWidth(columns int) int {
+	if columns <= 1 {
+		return 1
+	}
+	return columns*2 - 1
 }
 
 func (m Model) renderCommitFiles(files []commitmodel.CommitFile, width, height int, active bool, stageLabel ...string) string {

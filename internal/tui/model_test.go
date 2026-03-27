@@ -173,3 +173,15 @@ func TestMoveDownScrollsFilesUsingPaneHeight(t *testing.T) {
 		t.Fatalf("expected file offset to advance with the visible pane, got %d", next.fileOffset)
 	}
 }
+
+func TestCompactCommitGraphUsesGitPrefixTokens(t *testing.T) {
+	if got := compactCommitGraph("| * |", false, 3); got != "| * |" {
+		t.Fatalf("unexpected full graph strip: %q", got)
+	}
+	if got := compactCommitGraph("| * |", false, 2); got != "| *" {
+		t.Fatalf("unexpected compact graph strip: %q", got)
+	}
+	if got := compactCommitGraph("| *", true, 3); got != "| * \\" {
+		t.Fatalf("unexpected merge graph strip: %q", got)
+	}
+}

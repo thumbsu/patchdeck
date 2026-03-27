@@ -17,6 +17,8 @@ type Commit struct {
 	UnixTime  int64
 	Subject   string
 	Relative  string
+	Parents   []string
+	Graph     string
 }
 
 type CommitFile struct {
@@ -34,8 +36,10 @@ func Load(ctx context.Context, worktreePath string) ([]Commit, error) {
 
 	args := []string{
 		"log",
+		"--graph",
+		"--boundary",
 		"--date-order",
-		"--format=%H%x1f%h%x1f%ct%x1f%s",
+		"--format=%x1e%H%x1f%h%x1f%ct%x1f%P%x1f%s",
 		"-n", "50",
 	}
 	if rangeSpec != "" {
@@ -96,18 +100,24 @@ func detectBase(ctx context.Context, worktreePath string) string {
 }
 
 func parseLog(raw string, now time.Time) []Commit {
-	raw = strings.TrimSpace(raw)
-	if raw == "" {
+	raw = strings.TrimRight(raw, "\n")
+	if strings.TrimSpace(raw) == "" {
 		return nil
 	}
 
 	commits := make([]Commit, 0)
 	for _, line := range strings.Split(raw, "\n") {
-		if strings.TrimSpace(line) == "" {
+		if strings.TrimSpace(line) == "" || !strings.Contains(line, "\x1e") {
 			continue
 		}
-		parts := strings.SplitN(line, "\x1f", 4)
-		if len(parts) != 4 {
+
+		prefix, payload, ok := strings.Cut(line, "\x1e")
+		if !ok {
+			continue
+		}
+
+		parts := strings.SplitN(payload, "\x1f", 5)
+		if len(parts) != 5 {
 			continue
 		}
 
@@ -120,12 +130,34 @@ func parseLog(raw string, now time.Time) []Commit {
 			Hash:      parts[0],
 			ShortHash: parts[1],
 			UnixTime:  unixTime,
-			Subject:   parts[3],
+			Subject:   parts[4],
 			Relative:  relativeTime(now.Sub(time.Unix(unixTime, 0))),
+			Parents:   parseParents(parts[3]),
+			Graph:     normalizeGraphPrefix(prefix),
 		})
 	}
 
 	return commits
+}
+
+func parseParents(raw string) []string {
+	if strings.TrimSpace(raw) == "" {
+		return nil
+	}
+
+	parents := strings.Fields(raw)
+	if len(parents) == 0 {
+		return nil
+	}
+	return parents
+}
+
+func normalizeGraphPrefix(prefix string) string {
+	prefix = strings.TrimRight(prefix, " ")
+	if prefix == "" {
+		return "*"
+	}
+	return prefix
 }
 
 func LoadFiles(ctx context.Context, worktreePath string, commitHash string) ([]CommitFile, error) {
