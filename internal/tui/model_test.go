@@ -144,3 +144,32 @@ func TestRenderFilesKeepsSelectedFileVisibleAfterScroll(t *testing.T) {
 		t.Fatalf("expected selected file to remain visible, got view:\n%s", view)
 	}
 }
+
+func TestMoveDownScrollsFilesUsingPaneHeight(t *testing.T) {
+	m := New("")
+	m.width = 100
+	m.height = 12
+	m.root = "/tmp/repo"
+	m.currentPane = paneFiles
+	m.centerMode = centerFiles
+	m.selectedWorktreePath = "/tmp/repo"
+	m.refs["/tmp/repo"] = scanner.WorktreeRef{Path: "/tmp/repo", Branch: "feature/a"}
+	m.statuses["/tmp/repo"] = statusmodel.WorktreeStatus{
+		Ref: scanner.WorktreeRef{Path: "/tmp/repo", Branch: "feature/a"},
+		ChangedFiles: []statusmodel.ChangedFile{
+			{Path: "pkg/first.go", BaseName: "first.go", Dir: "pkg"},
+			{Path: "pkg/second.go", BaseName: "second.go", Dir: "pkg"},
+			{Path: "pkg/third.go", BaseName: "third.go", Dir: "pkg"},
+		},
+	}
+
+	m.ensureSelection()
+
+	next, _ := m.moveDown()
+	if next.selectedFilePath != "pkg/second.go" {
+		t.Fatalf("expected second file selected, got %q", next.selectedFilePath)
+	}
+	if next.fileOffset != 1 {
+		t.Fatalf("expected file offset to advance with the visible pane, got %d", next.fileOffset)
+	}
+}

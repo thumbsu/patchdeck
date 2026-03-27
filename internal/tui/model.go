@@ -265,10 +265,7 @@ func (m Model) View() string {
 	header := m.renderHeader(worktreeRows)
 	footer := m.renderFooter()
 
-	// Keep a 1-line safety margin. Some terminal layouts end up effectively
-	// overflowing by one row when the frame exactly matches the viewport.
-	bodyHeight := max(7, m.height-lipgloss.Height(header)-lipgloss.Height(footer)-1)
-	paneContentHeight := max(3, bodyHeight-2)
+	paneContentHeight := m.paneContentHeight()
 
 	switch {
 	case m.width >= 120:
@@ -408,7 +405,7 @@ func (m Model) moveDown() (Model, tea.Cmd) {
 			idx := m.selectedFileIndex(status.ChangedFiles)
 			if idx < len(status.ChangedFiles)-1 {
 				m.selectedFilePath = status.ChangedFiles[idx+1].Path
-				m.fileOffset = followOffset(m.fileOffset, idx+1, visibleItemCount(m.height))
+				m.fileOffset = followOffset(m.fileOffset, idx+1, m.listVisibleItemCount())
 				return m, m.loadDiffForSelection()
 			}
 		} else {
@@ -429,7 +426,7 @@ func (m Model) moveDown() (Model, tea.Cmd) {
 		idx := m.selectedCommitFileIndex(files)
 		if idx < len(files)-1 {
 			m.selectedCommitFilePath = files[idx+1].Path
-			m.commitFileOffset = followOffset(m.commitFileOffset, idx+1, visibleItemCount(m.height))
+			m.commitFileOffset = followOffset(m.commitFileOffset, idx+1, m.listVisibleItemCount())
 			return m, m.loadDiffForSelection()
 		}
 	case paneDiff:
@@ -458,7 +455,7 @@ func (m Model) moveUp() (Model, tea.Cmd) {
 			idx := m.selectedFileIndex(status.ChangedFiles)
 			if idx > 0 {
 				m.selectedFilePath = status.ChangedFiles[idx-1].Path
-				m.fileOffset = followOffset(m.fileOffset, idx-1, visibleItemCount(m.height))
+				m.fileOffset = followOffset(m.fileOffset, idx-1, m.listVisibleItemCount())
 				return m, m.loadDiffForSelection()
 			}
 		} else {
@@ -479,7 +476,7 @@ func (m Model) moveUp() (Model, tea.Cmd) {
 		idx := m.selectedCommitFileIndex(files)
 		if idx > 0 {
 			m.selectedCommitFilePath = files[idx-1].Path
-			m.commitFileOffset = followOffset(m.commitFileOffset, idx-1, visibleItemCount(m.height))
+			m.commitFileOffset = followOffset(m.commitFileOffset, idx-1, m.listVisibleItemCount())
 			return m, m.loadDiffForSelection()
 		}
 	case paneDiff:
@@ -557,7 +554,7 @@ func (m Model) toBottom() (Model, tea.Cmd) {
 			status, ok := m.currentStatus()
 			if ok && len(status.ChangedFiles) > 0 {
 				m.selectedFilePath = status.ChangedFiles[len(status.ChangedFiles)-1].Path
-				m.fileOffset = bottomOffset(len(status.ChangedFiles), visibleItemCount(m.height))
+				m.fileOffset = bottomOffset(len(status.ChangedFiles), m.listVisibleItemCount())
 				return m, m.loadDiffForSelection()
 			}
 		} else {
@@ -570,7 +567,7 @@ func (m Model) toBottom() (Model, tea.Cmd) {
 		files := m.currentCommitFiles()
 		if len(files) > 0 {
 			m.selectedCommitFilePath = files[len(files)-1].Path
-			m.commitFileOffset = bottomOffset(len(files), visibleItemCount(m.height))
+			m.commitFileOffset = bottomOffset(len(files), m.listVisibleItemCount())
 			return m, m.loadDiffForSelection()
 		}
 	case paneDiff:
@@ -607,7 +604,7 @@ func (m Model) jumpPriorityCenterItem(direction int) (Model, tea.Cmd) {
 				if m.currentPane < paneFiles {
 					m.currentPane = paneFiles
 				}
-				m.commitOffset = followOffset(m.commitOffset, idx, visibleItemCount(m.height))
+				m.commitOffset = followOffset(m.commitOffset, idx, m.listVisibleItemCount())
 				return m.selectCommit(commits[idx].Hash)
 			}
 		}
@@ -626,7 +623,7 @@ func (m Model) jumpPriorityCenterItem(direction int) (Model, tea.Cmd) {
 				if m.currentPane < paneFiles {
 					m.currentPane = paneFiles
 				}
-				m.commitFileOffset = followOffset(m.commitFileOffset, idx, visibleItemCount(m.height))
+				m.commitFileOffset = followOffset(m.commitFileOffset, idx, m.listVisibleItemCount())
 				return m, m.loadDiffForSelection()
 			}
 		}
@@ -647,7 +644,7 @@ func (m Model) jumpPriorityCenterItem(direction int) (Model, tea.Cmd) {
 			if m.currentPane < paneFiles {
 				m.currentPane = paneFiles
 			}
-			m.fileOffset = followOffset(m.fileOffset, idx, visibleItemCount(m.height))
+			m.fileOffset = followOffset(m.fileOffset, idx, m.listVisibleItemCount())
 			return m, m.loadDiffForSelection()
 		}
 	}
@@ -672,7 +669,7 @@ func (m *Model) ensureSelection() {
 	if !found {
 		m.selectedWorktreePath = rows[0].Ref.Path
 	}
-	m.worktreeOffset = followOffset(m.worktreeOffset, m.selectedWorktreeIndex(rows), visibleItemCount(m.height))
+	m.worktreeOffset = followOffset(m.worktreeOffset, m.selectedWorktreeIndex(rows), m.listVisibleItemCount())
 
 	commits := m.currentCommits()
 	if len(commits) == 0 {
@@ -689,7 +686,7 @@ func (m *Model) ensureSelection() {
 			m.selectedCommitHash = commits[0].Hash
 		}
 	}
-	m.commitOffset = followOffset(m.commitOffset, m.selectedCommitIndex(commits), visibleItemCount(m.height))
+	m.commitOffset = followOffset(m.commitOffset, m.selectedCommitIndex(commits), m.listVisibleItemCount())
 
 	commitFiles := m.currentCommitFiles()
 	if len(commitFiles) == 0 {
@@ -706,7 +703,7 @@ func (m *Model) ensureSelection() {
 			m.selectedCommitFilePath = commitFiles[0].Path
 		}
 	}
-	m.commitFileOffset = followOffset(m.commitFileOffset, m.selectedCommitFileIndex(commitFiles), visibleItemCount(m.height))
+	m.commitFileOffset = followOffset(m.commitFileOffset, m.selectedCommitFileIndex(commitFiles), m.listVisibleItemCount())
 
 	status, ok := m.currentStatus()
 	if !ok || len(status.ChangedFiles) == 0 {
@@ -716,7 +713,7 @@ func (m *Model) ensureSelection() {
 
 	for _, file := range status.ChangedFiles {
 		if file.Path == m.selectedFilePath {
-			m.fileOffset = followOffset(m.fileOffset, m.selectedFileIndex(status.ChangedFiles), visibleItemCount(m.height))
+			m.fileOffset = followOffset(m.fileOffset, m.selectedFileIndex(status.ChangedFiles), m.listVisibleItemCount())
 			return
 		}
 	}
@@ -1617,6 +1614,25 @@ func renderViewport(width, height, yOffset int, title, body string) string {
 	}
 	vp.YOffset = yOffset
 	return title + "\n" + vp.View()
+}
+
+func (m Model) paneContentHeight() int {
+	if m.width <= 0 || m.height <= 0 {
+		return 3
+	}
+
+	rows := m.sortedRows()
+	header := m.renderHeader(rows)
+	footer := m.renderFooter()
+
+	// Keep a 1-line safety margin. Some terminal layouts end up effectively
+	// overflowing by one row when the frame exactly matches the viewport.
+	bodyHeight := max(7, m.height-lipgloss.Height(header)-lipgloss.Height(footer)-1)
+	return max(3, bodyHeight-2)
+}
+
+func (m Model) listVisibleItemCount() int {
+	return visibleItemCount(m.paneContentHeight())
 }
 
 func visibleItemCount(height int) int {
