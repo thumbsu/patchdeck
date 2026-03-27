@@ -1,0 +1,13 @@
+# Go
+bin/
+dist/
+*.test
+coverage.out
+/patchdeck
+
+# Editor / OS
+.DS_Store
+
+# Local config
+.env
+.env.local
